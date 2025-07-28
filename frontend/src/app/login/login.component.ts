@@ -1,0 +1,71 @@
+import { Component, inject } from '@angular/core';
+import { MatButton } from '@angular/material/button';
+import { AuthService } from '../services/auth.service';
+import {
+  FormControl,
+  NonNullableFormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import {
+  MatError,
+  MatFormField,
+  MatInput,
+  MatLabel,
+} from '@angular/material/input';
+import {
+  MatCard,
+  MatCardActions,
+  MatCardContent,
+  MatCardHeader,
+  MatCardTitle,
+} from '@angular/material/card';
+
+type LogInForm = {
+  username: FormControl<string>;
+  password: FormControl<string>;
+};
+
+@Component({
+  selector: 'app-login',
+  imports: [
+    MatButton,
+    ReactiveFormsModule,
+    MatInput,
+    MatFormField,
+    MatLabel,
+    MatError,
+    MatCard,
+    MatCardHeader,
+    MatCardTitle,
+    MatCardContent,
+    MatCardActions,
+  ],
+  templateUrl: './login.component.html',
+  styleUrl: './login.component.scss',
+})
+export class LoginComponent {
+  private readonly authService = inject(AuthService);
+  private readonly formBuilder = inject(NonNullableFormBuilder);
+
+  public onFormSubmit() {
+    if (this.loginFormGroup.valid) {
+      this.handleLogin();
+    }
+  }
+
+  public handleLogin() {
+    this.authService.login(
+      this.loginFormGroup.controls.username.value,
+      this.loginFormGroup.controls.password.value,
+    );
+  }
+
+  protected readonly loginFormGroup = this.formBuilder.group<LogInForm>({
+    username: this.formBuilder.control('', [Validators.required]),
+    password: this.formBuilder.control('', [
+      Validators.required,
+      Validators.minLength(6),
+    ]),
+  });
+}
